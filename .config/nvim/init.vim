@@ -8,5 +8,12 @@ set tabstop=4 softtabstop=4 shiftwidth=4 expandtab smarttab autoindent
 
 syntax enable
 
-let g:vimtex_view_method = 'zathura'
 
+
+if system('uname -s') == "Darwin\n"
+    "OSX
+    let g:vimtex_view_method = 'skim'
+else
+    "Linux
+    let g:vimtex_view_method = 'zathura'
+endif
