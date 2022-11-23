@@ -37,7 +37,7 @@ require("mason-lspconfig").setup({
     ensure_installed = { "texlab" }
 })
 
-vim.g.coq_settings = { auto_start = 'shut_up' }
+vim.g.coq_settings = { auto_start = shut_up }
 
 local lsp = require "lspconfig"
 local coq = require "coq"
