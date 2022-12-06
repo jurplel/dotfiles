@@ -6,6 +6,7 @@ Plug 'neovim/nvim-lspconfig'
 Plug 'ms-jpq/coq_nvim', {'branch': 'coq'}
 Plug 'ms-jpq/coq.artifacts', {'branch': 'artifacts'}
 Plug 'ms-jpq/coq.thirdparty', {'branch': '3p'}
+Plug 'akinsho/toggleterm.nvim', {'tag' : '*'}
 call plug#end()
 
 
@@ -18,6 +19,8 @@ else
 endif
 
 lua require("cfg")
+
+    
 
 set number
 filetype plugin indent on
