@@ -2,6 +2,7 @@ vim.api.nvim_set_hl(0, "FloatBorder", {bg="#3B4252", fg="#5E81AC"})
 vim.api.nvim_set_hl(0, "NormalFloat", {bg="#3B4252"})
 vim.api.nvim_set_hl(0, "TelescopeNormal", {bg="#3B4252"})
 vim.api.nvim_set_hl(0, "TelescopeBorder", {bg="#3B4252"})
+vim.api.nvim_set_hl(0, "Pmenu", {ctermbg="DarkGray"})
 
 -- Mappings.
 -- See `:help vim.diagnostic.*` for documentation on any of the below functions
@@ -42,7 +43,7 @@ require("mason-lspconfig").setup({
     ensure_installed = { "texlab" }
 })
 
-vim.g.coq_settings = { auto_start = true | 'shut-up' }
+vim.g.coq_settings = { auto_start = true and 'shut-up' }
 
 local lsp = require "lspconfig"
 local coq = require "coq"
