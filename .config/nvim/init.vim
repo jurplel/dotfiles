@@ -3,10 +3,19 @@ Plug 'lervag/vimtex'
 Plug 'williamboman/mason.nvim'
 Plug 'williamboman/mason-lspconfig.nvim'
 Plug 'neovim/nvim-lspconfig'
+
 Plug 'ms-jpq/coq_nvim', {'branch': 'coq'}
 Plug 'ms-jpq/coq.artifacts', {'branch': 'artifacts'}
 Plug 'ms-jpq/coq.thirdparty', {'branch': '3p'}
+
 Plug 'akinsho/toggleterm.nvim', {'tag' : '*'}
+
+Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
+Plug 'lukas-reineke/indent-blankline.nvim'
+
+Plug 'NMAC427/guess-indent.nvim'
+Plug 'numToStr/Comment.nvim'
+
 call plug#end()
 
 
@@ -18,12 +27,9 @@ else
     let g:vimtex_view_method = 'zathura'
 endif
 
-lua require("cfg")
-
-    
+lua require("cfg")    
 
 set number
 filetype plugin indent on
-set tabstop=4 softtabstop=4 shiftwidth=4 expandtab smarttab autoindent
 
 syntax enable

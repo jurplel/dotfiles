@@ -50,8 +50,13 @@ local coq = require "coq"
 
 lsp.texlab.setup(coq.lsp_ensure_capabilities {})
 
+
 require("toggleterm").setup{
     open_mapping = [[<c-\>]],
     direction = 'float',
     shade_terminals = true,
 }
+
+require('guess-indent').setup {}
+require('Comment').setup()
+
