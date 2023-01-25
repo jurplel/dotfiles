@@ -84,6 +84,9 @@ vim.api.nvim_set_hl(0, "TelescopeNormal", {bg="#3B4252"})
 vim.api.nvim_set_hl(0, "TelescopeBorder", {bg="#3B4252"})
 vim.api.nvim_set_hl(0, "Pmenu", {ctermbg="DarkGray"})
 
+-- map shift tab 
+vim.api.nvim_set_keymap('i', '<S-Tab>', '<C-d>', {})
+
 -- Make line numbers default
 vim.wo.number = true
 
@@ -127,6 +130,9 @@ require('indent_blankline').setup {
 -- commenting
 require('Comment').setup()
 
+require('Comment.ft')
+  .set('sml', '(*%s*)')
+
 -- Set lualine as statusline
 -- See `:help lualine.txt`
 require('lualine').setup {
@@ -144,7 +150,7 @@ require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
   ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'typescript', 'help', 'vim', 'latex' },
 
-  highlight = { enable = true },
+  highlight = { enable = true, disable = {"latex"} },
   indent = { enable = true },
   incremental_selection = {
     enable = true,
