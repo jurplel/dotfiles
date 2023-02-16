@@ -58,6 +58,11 @@ require('packer').startup(function(use)
 
   use 'lervag/vimtex' -- Latex building
 
+  use {
+    'nvim-telescope/telescope.nvim', branch = '0.1.x',
+    requires = { {'nvim-lua/plenary.nvim'} }
+  }
+
   -- Automatically set up your configuration after cloning packer.nvim
   if packer_bootstrap then
     require('packer').sync()
@@ -403,3 +408,10 @@ npairs.add_rules({
   Rule("$", "$", "lua")
     :with_pair(ts_conds.is_not_ts_node({'function'}))
 })
+
+local builtin = require('telescope.builtin')
+vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
+vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
+vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
+vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
+
