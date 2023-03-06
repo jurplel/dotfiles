@@ -31,7 +31,7 @@ require('packer').startup(function(use)
 
   use { -- Autocompletion
     'hrsh7th/nvim-cmp',
-    requires = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip' },
+    requires = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip', 'hrsh7th/cmp-nvim-lsp-signature-help' },
   }
 
   use { -- Highlight, edit, and navigate code
@@ -116,7 +116,8 @@ vim.o.termguicolors = true
 require('ayu').colorscheme()
 
 -- Set completeopt to have a better completion experience
-vim.o.completeopt = 'menuone,noselect'
+vim.o.completeopt = "menuone,noinsert,noselect"
+vim.opt.shortmess = vim.opt.shortmess + "c"
 
 -- Enable togglable terminal
 require("toggleterm").setup{
@@ -276,7 +277,11 @@ local servers = {
   -- clangd = {},
   -- gopls = {},
   -- pyright = {},
-  rust_analyzer = {},
+  rust_analyzer = {
+    checkOnSave = {
+      command = "clippy"
+    }
+  },
   -- tsserver = {},
   
   texlab = {},
@@ -367,6 +372,7 @@ cmp.setup {
   sources = {
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
+    { name = 'nvim_lsp_signature_help' }
   },
 }
 
