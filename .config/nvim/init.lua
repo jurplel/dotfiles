@@ -34,6 +34,10 @@ require('packer').startup(function(use)
     tag = 'legacy'
   }
 
+  use {
+    "kylechui/nvim-surround"
+  }
+
   use { -- Autocompletion
     'hrsh7th/nvim-cmp',
     requires = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip', 'hrsh7th/cmp-nvim-lsp-signature-help' },
@@ -336,6 +340,8 @@ lspconfig.millet.setup{
 -- Turn on lsp status information
 require('fidget').setup()
 
+-- nvim-surround
+require("nvim-surround").setup()
 
 -- nvim-cmp setup
 local cmp = require 'cmp'
