@@ -13,6 +13,7 @@ config.window_decorations = "INTEGRATED_BUTTONS|RESIZE"
 
 -- For example, changing the color scheme:
 config.color_scheme = 'Pro'
+-- config.color_scheme = 'Pro Light'
 
 -- Default size
 config.font_size = 16
