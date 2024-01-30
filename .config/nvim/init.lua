@@ -128,9 +128,11 @@ require("toggleterm").setup{
 
 -- Enable `lukas-reineke/indent-blankline.nvim`
 -- See `:help indent_blankline.txt`
-require('indent_blankline').setup {
-  char = '┊',
-  show_trailing_blankline_indent = false,
+require("ibl").setup {
+  indent = { char = '┊' },
+  whitespace = {
+    remove_blankline_trail = true,
+  }
 }
 
 -- commenting
@@ -274,9 +276,8 @@ end
 --  Add any additional override configuration in the following tables. They will be passed to
 --  the `settings` field of the server config. You must look up that documentation yourself.
 local servers = {
-  -- clangd = {},
+  clangd = {},
   -- gopls = {},
-  -- pyright = {},
   rust_analyzer = {
     checkOnSave = {
       command = "clippy"
@@ -327,6 +328,8 @@ lspconfig.millet.setup{
   capabilities = capabilities,
   on_attach = on_attach,
 }
+
+vim.keymap.set('n', '<F4>', '<cmd>ClangdSwitchSourceHeader<cr>', {})
 
 -- Turn on lsp status information
 require('fidget').setup()
