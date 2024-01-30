@@ -29,6 +29,20 @@ require('packer').startup(function(use)
     },
   }
 
+  use {
+    'j-hui/fidget.nvim',
+    tag = 'legacy'
+  }
+
+  use {
+    "folke/trouble.nvim",
+     requires = { "nvim-tree/nvim-web-devicons" },
+  }
+
+  use {
+    "kylechui/nvim-surround"
+  }
+
   use { -- Autocompletion
     'hrsh7th/nvim-cmp',
     requires = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip', 'hrsh7th/cmp-nvim-lsp-signature-help' },
@@ -156,7 +170,7 @@ require('lualine').setup {
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'typescript', 'help', 'vim', 'latex' },
+  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'typescript', 'vimdoc', 'vim', 'latex' },
 
   highlight = { enable = true, disable = {"latex"} },
   indent = { enable = true },
@@ -334,6 +348,8 @@ vim.keymap.set('n', '<F4>', '<cmd>ClangdSwitchSourceHeader<cr>', {})
 -- Turn on lsp status information
 require('fidget').setup()
 
+-- nvim-surround
+require("nvim-surround").setup()
 
 -- nvim-cmp setup
 local cmp = require 'cmp'
@@ -424,3 +440,10 @@ vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
 vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
 vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
 
+-- Trouble keybindings
+vim.keymap.set("n", "<leader>xx", function() require("trouble").toggle() end)
+vim.keymap.set("n", "<leader>xw", function() require("trouble").toggle("workspace_diagnostics") end)
+vim.keymap.set("n", "<leader>xd", function() require("trouble").toggle("document_diagnostics") end)
+vim.keymap.set("n", "<leader>xq", function() require("trouble").toggle("quickfix") end)
+vim.keymap.set("n", "<leader>xl", function() require("trouble").toggle("loclist") end)
+vim.keymap.set("n", "gR", function() require("trouble").toggle("lsp_references") end)
