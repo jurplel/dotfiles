@@ -74,8 +74,9 @@ require('packer').startup(function(use)
 
   use {
     'nvim-telescope/telescope.nvim', branch = '0.1.x',
-    requires = { {'nvim-lua/plenary.nvim'} }
+    requires = { {'nvim-lua/plenary.nvim'}, {"nvim-tree/nvim-web-devicons"} }
   }
+
 
   -- Automatically set up your configuration after cloning packer.nvim
   if packer_bootstrap then
@@ -314,43 +315,6 @@ local servers = {
 -- Setup neovim lua configuration
 require('neodev').setup()
 
--- nvim-cmp supports additional completion capabilities, so broadcast that to servers
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
-
-require("mason").setup()
-
-local lspconfig = require 'lspconfig'
-local mason_lspconfig = require 'mason-lspconfig'
-
-mason_lspconfig.setup({
-  ensure_installed = vim.tbl_keys(servers)
-})
-
-mason_lspconfig.setup_handlers {
-  function(server_name)
-    lspconfig[server_name].setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-      settings = servers[server_name],
-    }
-  end,
-}
-
--- Mason doesn't support Millet for SML
-lspconfig.millet.setup{
-  capabilities = capabilities,
-  on_attach = on_attach,
-}
-
-vim.keymap.set('n', '<F4>', '<cmd>ClangdSwitchSourceHeader<cr>', {})
-
--- Turn on lsp status information
-require('fidget').setup()
-
--- nvim-surround
-require("nvim-surround").setup()
-
 -- nvim-cmp setup
 local cmp = require 'cmp'
 local luasnip = require 'luasnip'
@@ -394,6 +358,43 @@ cmp.setup {
     { name = 'nvim_lsp_signature_help' }
   },
 }
+
+-- nvim-cmp supports additional completion capabilities, so broadcast that to servers
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+
+require("mason").setup()
+
+local lspconfig = require 'lspconfig'
+local mason_lspconfig = require 'mason-lspconfig'
+
+mason_lspconfig.setup({
+  ensure_installed = vim.tbl_keys(servers)
+})
+
+mason_lspconfig.setup_handlers {
+  function(server_name)
+    lspconfig[server_name].setup {
+      capabilities = capabilities,
+      on_attach = on_attach,
+      settings = servers[server_name],
+    }
+  end,
+}
+
+-- Mason doesn't support Millet for SML
+lspconfig.millet.setup{
+  capabilities = capabilities,
+  on_attach = on_attach,
+}
+
+vim.keymap.set('n', '<F4>', '<cmd>ClangdSwitchSourceHeader<cr>', {})
+
+-- Turn on lsp status information
+require('fidget').setup()
+
+-- nvim-surround
+require("nvim-surround").setup()
 
 if vim.loop.os_uname().sysname == "Darwin" then
   vim.g.vimtex_view_method = "skim"
