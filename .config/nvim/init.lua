@@ -29,9 +29,18 @@ require('packer').startup(function(use)
     },
   }
 
+  use 'github/copilot.vim' -- copilot
+
+  -- clangd extensions!
+  use 'p00f/clangd_extensions.nvim'
+
   use {
     'j-hui/fidget.nvim',
     tag = 'legacy'
+  }
+
+  use {
+    'lewis6991/gitsigns.nvim'
   }
 
   use {
@@ -51,10 +60,13 @@ require('packer').startup(function(use)
   use { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     run = function()
-      pcall(require('nvim-treesitter.install').update { with_sync = true })
+			pcall(ts.update { with_sync = true })
     end,
   }
 
+  use { -- Highlight, edit, and navigate code
+    'nvim-treesitter/nvim-treesitter-context'
+  }
 
   use {
         "windwp/nvim-autopairs",
@@ -74,8 +86,10 @@ require('packer').startup(function(use)
 
   use {
     'nvim-telescope/telescope.nvim', branch = '0.1.x',
-    requires = { {'nvim-lua/plenary.nvim'} }
+    requires = { {'nvim-lua/plenary.nvim'}, {"nvim-tree/nvim-web-devicons"} }
   }
+
+  use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release' }
 
   -- Automatically set up your configuration after cloning packer.nvim
   if packer_bootstrap then
@@ -135,9 +149,17 @@ vim.opt.shortmess = vim.opt.shortmess + "c"
 
 -- Enable togglable terminal
 require("toggleterm").setup{
+    size = function(term)
+      if term.direction == "vertical" then
+        return vim.o.columns * 0.4
+      else
+        return 40
+      end
+    end,
     open_mapping = [[<c-\>]],
-    direction = 'float',
+    direction = 'vertical',
     shade_terminals = true,
+    persist_mode = true,
 }
 
 -- Enable `lukas-reineke/indent-blankline.nvim`
@@ -167,6 +189,11 @@ require('lualine').setup {
 }
 
 -- [[ Configure Treesitter ]]
+
+if vim.env.NVIM_TREESITTER_CXX_COMPILER then 
+	require 'nvim-treesitter.install'.compilers = { vim.env.NVIM_TREESITTER_CXX_COMPILER }
+end
+
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
@@ -260,11 +287,9 @@ local on_attach = function(_, bufnr)
   nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
 
   nmap('gd', vim.lsp.buf.definition, '[G]oto [D]efinition')
-  -- nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
+  nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
   nmap('gI', vim.lsp.buf.implementation, '[G]oto [I]mplementation')
-  nmap('<leader>D', vim.lsp.buf.type_definition, 'Type [D]efinition')
-  -- nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
-  -- nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+  nmap('<leader>td', vim.lsp.buf.type_definition, '[T]ype [D]efinition')
 
   -- See `:help K` for why this keymap
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
@@ -290,7 +315,8 @@ end
 --  Add any additional override configuration in the following tables. They will be passed to
 --  the `settings` field of the server config. You must look up that documentation yourself.
 local servers = {
-  clangd = {},
+  -- not working @ SF
+  -- clangd = {},
   -- gopls = {},
   rust_analyzer = {
     checkOnSave = {
@@ -313,43 +339,6 @@ local servers = {
 
 -- Setup neovim lua configuration
 require('neodev').setup()
-
--- nvim-cmp supports additional completion capabilities, so broadcast that to servers
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
-
-require("mason").setup()
-
-local lspconfig = require 'lspconfig'
-local mason_lspconfig = require 'mason-lspconfig'
-
-mason_lspconfig.setup({
-  ensure_installed = vim.tbl_keys(servers)
-})
-
-mason_lspconfig.setup_handlers {
-  function(server_name)
-    lspconfig[server_name].setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-      settings = servers[server_name],
-    }
-  end,
-}
-
--- Mason doesn't support Millet for SML
-lspconfig.millet.setup{
-  capabilities = capabilities,
-  on_attach = on_attach,
-}
-
-vim.keymap.set('n', '<F4>', '<cmd>ClangdSwitchSourceHeader<cr>', {})
-
--- Turn on lsp status information
-require('fidget').setup()
-
--- nvim-surround
-require("nvim-surround").setup()
 
 -- nvim-cmp setup
 local cmp = require 'cmp'
@@ -395,6 +384,75 @@ cmp.setup {
   },
 }
 
+-- nvim-cmp supports additional completion capabilities, so broadcast that to servers
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+
+require("mason").setup()
+
+local lspconfig = require 'lspconfig'
+local mason_lspconfig = require 'mason-lspconfig'
+
+mason_lspconfig.setup({
+  ensure_installed = vim.tbl_keys(servers)
+})
+
+mason_lspconfig.setup_handlers {
+  function(server_name)
+    lspconfig[server_name].setup {
+      capabilities = capabilities,
+      on_attach = on_attach,
+      settings = servers[server_name],
+    }
+  end,
+}
+
+-- Mason doesn't support Millet for SML
+lspconfig.millet.setup{
+  capabilities = capabilities,
+  on_attach = on_attach,
+}
+
+lspconfig.clangd.setup {
+  handlers = {
+    ['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, { border = 'rounded', witdth = 100 })
+  },
+  on_attach = function(client, bufnr)
+    on_attach(client, bufnr)
+
+    bind_keys(bufnr)
+
+    -- Highlight references of symbold under cursor
+    maybe_highlight_references(client, bufnr)
+  end,
+  cmd = {
+    'clangd',
+    '--background-index',
+    '--pch-storage=memory',
+    '--clang-tidy',
+    '--suggest-missing-includes',
+    '--all-scopes-completion',
+    '--pretty',
+    '--header-insertion=never',
+    '--completion-style=detailed',
+    '-j=4',
+    '--header-insertion-decorators',
+  },
+  filetypes = { 'c', 'cpp', 'objc', 'objcpp' },
+  root_dir = lspconfig.util.root_pattern('compile_commands.json'),
+  single_file_support = false,
+  init_option = { fallbackFlags = { '-std=c++17' } },
+  capabilities = capabilities
+}
+
+vim.keymap.set('n', '<F4>', '<cmd>ClangdSwitchSourceHeader<cr>', {})
+
+-- Turn on lsp status information
+require('fidget').setup()
+
+-- nvim-surround
+require("nvim-surround").setup()
+
 if vim.loop.os_uname().sysname == "Darwin" then
   vim.g.vimtex_view_method = "skim"
 else
@@ -435,10 +493,15 @@ npairs.add_rules({
 })
 
 local builtin = require('telescope.builtin')
-vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
-vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
-vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
-vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
+vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = '[F]ind [F]iles'})
+vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = '[F]ind [G]rep'})
+vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = '[F]ind [B]uffers'})
+vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = '[F]ind [H]elp'})
+vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = '[F]ind [H]elp'})
+vim.keymap.set('n', '<leader>ds', builtin.lsp_document_symbols, { desc = '[D]ocument [S]ymbols'})
+vim.keymap.set('n', '<leader>fs', builtin.lsp_dynamic_workspace_symbols, { desc = '[F]ind [S]ymbols'})
+vim.keymap.set('n', '<leader>fo', builtin.oldfiles, { desc = '[F]ind [O]ldfiles'})
+vim.keymap.set('n', 'gr', builtin.lsp_references, { desc = '[G]oto [R]eferences'})
 
 -- Trouble keybindings
 vim.keymap.set("n", "<leader>xx", function() require("trouble").toggle() end)
@@ -447,3 +510,7 @@ vim.keymap.set("n", "<leader>xd", function() require("trouble").toggle("document
 vim.keymap.set("n", "<leader>xq", function() require("trouble").toggle("quickfix") end)
 vim.keymap.set("n", "<leader>xl", function() require("trouble").toggle("loclist") end)
 vim.keymap.set("n", "gR", function() require("trouble").toggle("lsp_references") end)
+
+-- Gitsigns
+require('gitsigns').setup()
+
