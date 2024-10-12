@@ -315,8 +315,7 @@ end
 --  Add any additional override configuration in the following tables. They will be passed to
 --  the `settings` field of the server config. You must look up that documentation yourself.
 local servers = {
-  -- not working @ SF
-  -- clangd = {},
+  clangd = {},
   -- gopls = {},
   rust_analyzer = {
     checkOnSave = {
